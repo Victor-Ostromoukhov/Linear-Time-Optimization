@@ -1,0 +1,7 @@
+Resources[
+    Version[1],
+    ExecutionBuildCommand["<<LinearTimeOptimization`"],
+    Paclet[
+        FunctionPaclet[False]
+    ]
+]
