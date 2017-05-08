@@ -236,21 +236,102 @@ getDiscrepancy2Dexact[pts_] :=
         Last @ (Flatten@Import["tmp/res"<>pid<>".dat"])
     ] (* getDiscrepancy2Dexact *)
 
+getGL2DDiscreapancy[dtab_,imagesize_:{1100,700},ourLabel_:"Ours"] :=
+    Module[ {(*refpow05,refpow1LogSMinus1Halved,dtrefpow1LogSab,coef,npts,val,pDiscrepancy,discrepancyTabSobol,discrepancyHalton,discrepancyStratified,discrepancyPoissonDisk,discrepancyWhiteNoise,s*)},
+        discrepancyWhiteNoise =  Get["data_discrepancy/discrepancyWhiteNoise.dat"];
+        discrepancyStratified = Get["data_discrepancy/discrepancyStratified.dat"];
+        discrepancyPoissonDisk = Get["data_discrepancy/discrepancyPoissonDisk.dat"];
+        (*discrepancyTabSobol = Get["data_discrepancy/discrepancyTabSobol.dat"];
+        discrepancyHalton = Get["data_discrepancy/discrepancyHalton.dat"];*)
+
+        discrepancyTabSobol = Get["data_discrepancy/discrepancyTabSobol_short_step1over8.dat"];
+        discrepancyHalton = Get["data_discrepancy/discrepancyHalton_short_step1over8.dat"];
+        s=2;
+        coef = 2.2;
+        refpow05 = Table[
+            npts = Round[2^(i/8)];
+            val = coef npts^-.5;
+            {npts,val}
+        ,{i,3*8, 20*8}];
+        coef = 1/2^(4 s) 1/((s - 1) Log[10,2])^((s - 1)/2) // N; (* Roth's consta *)
+        coef = .2;
+        refpow1LogS = Table[
+            npts = Round[2^(i/8)];
+            val = coef (Log[npts])^s npts^-1.0;
+            {npts,val}
+        ,{i,15*8, 20*8}];
+        coef = .5;
+        refpow1LogSMinus1Halved = Table[
+            npts = Round[2^(i/8)];
+            val = coef (Log[npts])^((s-1)/2) npts^-1.0;
+            {npts,val}
+        ,{i,15*8, 20*8}];
+        k = .;
+        pDiscrepancy = ListPlot[{
+		            Log[10,#]&  /@ refpow05,
+		            Log[10,#]&  /@ discrepancyWhiteNoise,
+		            Log[10,#]&  /@ discrepancyPoissonDisk, 
+		            Log[10,#]&  /@ discrepancyStratified, 
+		            Log[10,#]& /@ discrepancyHalton, 
+		            Log[10,#]& /@ discrepancyTabSobol,
+		            Log[10,#]&  /@ dtab,
+		            Log[10,#]&  /@ refpow1LogS,
+		            Log[10,#]&  /@ refpow1LogSMinus1Halved
+		        }
+            , PlotLegends ->  Placed[#,{.25,.4}]& @ {
+                Style[#,30]& @ (Subscript[k,1]  / N^Style["1/2",Italic]  ),
+                Style[#,30]& @"WhiteNoise",
+                Style[#,30]& @"PoissonDisk",
+                Style[#,30]& @"Jitter",
+                Style[#,30]& @"Halton",
+                Style[#,30]& @"Sobol2dGrayCode_1_2",
+                Style[#,30]& @ ourLabel,
+                (*Style[#,30]& @ (Subscript[k,2] Style["(Log N)",Italic]  / N^Style["1",Italic] )*)
+                Style[#,30]& @ (Subscript[k,2] Style["(Log N)"^Style["s",Italic],Italic] / N^Style["1",Italic] ),
+                Style[#,30]& @ (Subscript[k,3] Style["(Log N)"^Style["(s-1)/2",Italic],Italic] / N^Style["1",Italic])
+                }
+            ,PlotRange->{{.5,6.03},Automatic}
+            (*,FrameTicks->{{N[# Log[4]/Log[10]],ToString[#] }& /@ Range[12] ,Automatic}*)
+            ,FrameTicks->{Automatic,Automatic}
+            ,AspectRatio->.61
+            ,FrameLabel-> {Style[ HoldForm@(Subscript[Log, 10] "(NSamples)"), 36],Style[ HoldForm@(Subscript[Log, 10] "(Discrepancy)"), 36] }
+            ,FrameStyle->Directive[Black,24]
+            ,RotateLabel -> True
+            ,PlotMarkers->{{\[FilledCircle],1},{\[FilledCircle],10},{\[FilledCircle],10},{\[FilledCircle],10},{\[FilledCircle],10},{\[FilledCircle],10},{\[FilledCircle],10},{\[FilledCircle],1}}
+            ,Frame->True
+            ,ImageSize -> imagesize
+            ,PlotStyle->  {{Black,AbsoluteDashing[{10,5}]},Black,Orange,Green,Blue,Gray,{Thickness[.003],Red},{Red,Dotted},{Blue,Dotted}}
+            , Joined->True
+            ,PlotRange->All
+            ,PlotLabel-> Style["log-log 2D Discrepancy",Black,42]
+            ];
+        (*pDiscrepancy//Print;*)
+        (*ListPlot[({Log[#[[1]]],Log[ #[[1]]/Log[#[[1]]] #[[2]]]} & /@ #) & /@ {refpow05,discrepancyWhiteNoise,discrepancyPoissonDisk,discrepancyStratified,discrepancyHalton,discrepancyTabSobol,dtab,refpow10}
+        	, Joined -> True, ImageSize -> {1100, 700}, AspectRatio->.61, PlotStyle->{{Black,AbsoluteDashing[{10,5}]},Black,Orange,Green,Blue,Gray,Red,{Black,Dotted}}]//Print;*)
+        pDiscrepancy
+    ] (* getGL2DDiscreapancy *)
+
 (*-------------------------------------------------------------------*)
 
 exploreData[] :=
     Module[ {},
 		(* D* *)
 		names = {"pts_1092_23.dat","pts_17476_15.dat","pts_279620_24.dat","pts_4369_17.dat","pts_69905_15.dat"};
+		names = {"pts_17476.dat","pts_279620.dat","pts_69905.dat","spectral.png"};
 		dtab = Sort @ Table[
 			name = names[[iname]];
 			fname = "data/sets_20170508/"<>name;
+			fname = "data/sets_20170503/"<>name;
 			pts = Import[fname];
 			npts = Length[pts];
 			d = getDiscrepancy2Dexact[pts];
 			Print["Processing "fname-> {npts,d} ];
+			{npts,d}
 		,{iname,Length[names]}];
 		Print[dtab];
+		
+		(*dtab = {{1092, 0.013725}, {4369, 0.00316811}, {17476, 0.00169935}, {69905, 0.000531731}, {279620, 0.000210969}};*)
+		getGL2DDiscreapancy[dtab,{1100,700},"LinearTimeOptim"]//Print;
 
 		(* Fourier *)
     	fouriertabsz=2 4096;
