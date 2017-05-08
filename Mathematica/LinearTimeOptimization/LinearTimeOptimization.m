@@ -154,7 +154,7 @@ niceRaster[img_,OptionsPattern[]] :=
     ];
 Options[niceRaster] = {zoom->1,PlotLabel->None};
 
-get2DfourierAndRadial[pts4K_,lbl_:""] := (* pts4K must be between 0 and 1 *)
+get2DfourierAndRadial4K[pts4K_,lbl_:""] := (* pts4K must be between 0 and 1 *)
     Module[ {fouriertabsz=4096,fsum,centralSz=128,rfsum,fs,fs1,maxval,maxpositions,rgbimage,iy,ix,radialSpectrum,radialSpectrumMax,
     	maxradialSpectrum,maxradialSpectrumMax,radialSpectrumScrambledLDS2dPureRandom,p1,p2,p3},
         radialSpectrumScrambledLDS2dPureRandom = {{1,4.29518*10^-8},{2,7.79978*10^-8},{3,9.82786*10^-8},{4,2.14975*10^-7},{5,3.89991*10^-7},{6,5.65343*10^-7},{7,7.58657*10^-7},{8,1.19737*10^-6},{9,3.06498*10^-6},{10,4.0001*10^-6},{11,6.12319*10^-6},{12,7.05342*10^-6},{13,7.81769*10^-6},{14,0.0000111474},{15,0.0000151127},{16,0.0000206135},{17,0.0000224409},{18,0.0000224069},{19,0.0000325448},{20,0.0000429995},{21,0.0000449287},{22,0.0000448171},{23,0.0000583691},{24,0.0000538246},{25,0.0000515352},{26,0.000053307},{27,0.0000571127},{28,0.0000724713},{29,0.0000915756},{30,0.0000918046},{31,0.000100565},{32,0.000124037},{33,0.000108819},{34,0.000106498},{35,0.000130497},{36,0.000138639},{37,0.000145227},{38,0.000175364},{39,0.000166251},{40,0.000176758},{41,0.000168615},{42,0.000165452},{43,0.000157801},{44,0.00015592},{45,0.000180432},{46,0.000170291},{47,0.000183831},{48,0.000197654},{49,0.000190239},{50,0.000205299},{51,0.000196384},{52,0.000199393},{53,0.000184867},{54,0.000199862},{55,0.00019525},{56,0.000183077},{57,0.000227733},{58,0.000232363},{59,0.000223094},{60,0.0001988},{61,0.000178908},{62,0.000201434},{63,0.00021009},{64,0.000208837},{65,0.00019644},{66,0.000182541},{67,0.000187736},{68,0.000190628},{69,0.000188631},{70,0.000197614},{71,0.000211417},{72,0.000204345},{73,0.000177879},{74,0.000169891},{75,0.000182841},{76,0.000200353},{77,0.000200096},{78,0.000192625},{79,0.000195345},{80,0.000200256},{81,0.000201079},{82,0.000216014},{83,0.000201631},{84,0.000198567},{85,0.000203169},{86,0.000205037},{87,0.000203988},{88,0.000199763},{89,0.000192393},{90,0.000186826},{91,0.000200103},{92,0.000231857},{93,0.000224188},{94,0.000218426},{95,0.0002249},{96,0.000220904},{97,0.000220412},{98,0.00021262},{99,0.000192152},{100,0.000188746},{101,0.000220298},{102,0.000218039},{103,0.000196443},{104,0.000189949},{105,0.000210372},{106,0.000226739},{107,0.000209216},{108,0.000201318},{109,0.000197378},{110,0.000182891},{111,0.000184064},{112,0.000199954},{113,0.000204013},{114,0.000228216},{115,0.000225159},{116,0.000207721},{117,0.000212594},{118,0.00019653},{119,0.000189115},{120,0.000194733}};
@@ -182,6 +182,34 @@ get2DfourierAndRadial[pts4K_,lbl_:""] := (* pts4K must be between 0 and 1 *)
         {p1,p2,p3}
     ] (* get2DfourierAndRadial *)
 
+get2DfourierAndRadial16K[pts4K_,lbl_:""] := (* pts4K must be between 0 and 1 *)
+    Module[ {fouriertabsz=2 4096,fsum,centralSz=2 128,rfsum,fs,fs1,maxval,maxpositions,rgbimage,iy,ix,radialSpectrum,radialSpectrumMax,
+    	maxradialSpectrum,maxradialSpectrumMax,p1,p2,p3},
+		fFourier := getFourier2D; (* getFourier2D or getFourier2DPlusMorror *)
+        fsum = (Chop @ fFourier[Floor[1+ fouriertabsz pts4K], fouriertabsz]);
+        fsum[[1,1]] = 0;
+        rfsum = reorg2D[fsum];
+        fs = rfsum[[fouriertabsz/2+1 - centralSz ;; fouriertabsz/2+1 + centralSz, fouriertabsz/2+1 - centralSz ;; fouriertabsz/2+1 + centralSz ]];
+        (*fs1 = T[T[fs[[32;;225]]][[32;;225]]]; (* area [-1.5,11.5] *)*)
+        fs1 = fs;
+        maxval = Max[fs1];
+        maxpositions = Position[fs1, Max[fs1]];
+        (*fs1[[98,98]] = 1;*)
+        rgbimage = Partition[#,Length[fs1]]& @ ({Flatten@fs1,Flatten@fs1,Flatten@fs1}//T);
+        ({ix,iy} = #; rgbimage[[iy,ix]] = {1,0,0}) & /@ maxpositions;
+        {radialSpectrum,radialSpectrumMax} = radialPowerSpectrum[fs^2];
+        maxradialSpectrum = Max[radialSpectrum];
+        maxradialSpectrumMax = Max[radialSpectrumMax];
+        radialSpectrum = {Range[Length[radialSpectrum]],radialSpectrum}//T;
+        radialSpectrumMax = {Range[Length[radialSpectrumMax]],radialSpectrumMax}//T;
+		{p1,p2,p3} = {
+		Graphics[{PointSize[.005],Point/@ pts4K}, ImageSize -> {256,256}, PlotLabel->lbl],
+		niceRaster[30^2 rgbimage^2,zoom->2],
+             ListPlot[{radialSpectrum[[;;2 120]],(*{{2 67,0},{2  67,.0004}},*){{0,.0002},{2 120,.0002}}},
+             PlotStyle->{Red,Cyan,Cyan},Joined->True,AspectRatio->256/512,Ticks->None, ImageSize -> {300, 300}]};
+        {radialSpectrum[[;;2 120]],p2,p3}
+    ] (* get2DfourierAndRadial16K *)
+
 radialPowerSpectrum[fpower_,dbg_:False] :=
     Module[ {fouriertabsz = Length[fpower], binsScalingFactor = 1, bins, r, radialSpectrum,radialSpectrumMax},
         bins = Table[{{},0},{ fouriertabsz}];
@@ -199,17 +227,50 @@ radialPowerSpectrum[fpower_,dbg_:False] :=
         {radialSpectrum,radialSpectrumMax}
      ] (* radialPowerSpectrum *)
 
+getDiscrepancy2Dexact[pts_] :=
+    Module[ {execString},
+        Export["tmp/tmp"<>pid<>".dat",N[pts]];
+        execString =  "discrepancy -i tmp/tmp"<>pid<>".dat -o tmp/res"<>pid<>".dat -d 2 > /dev/null"; (* Linux: OpenMP version; Mac: non-parallel version *)
+        (*Print[execString];*)
+        Run[execPrefix<>execString];
+        Last @ (Flatten@Import["tmp/res"<>pid<>".dat"])
+    ] (* getDiscrepancy2Dexact *)
 
 (*-------------------------------------------------------------------*)
 
 exploreData[] :=
     Module[ {},
-    	fouriertabsz=4096;
-    	centralSz=128;
-    	fname = "data/pts_69905_15.dat";
-    	fname = "data/pts_4369_17.dat";
+    	fouriertabsz=2 4096;
+    	centralSz=2 128;
+    	fname = "data/sets_20170508/pts_69905_15.dat";
+    	fname = "data/sets_20170508/pts_4369_17.dat";
+    	fname = "data/sets_20170508/pts_17476_15.dat";
         pts = Import[fname];
         Graphics[{Point/@pts},ImageSize -> 1/2{ 1024,1024}]//Print;
-            {p1,p2,p3} = get2DfourierAndRadial[pts,"LinearTimeOptim"];
-            {p1,p2,p3}//Print;
+            {rPS1,p2,p3} = get2DfourierAndRadial16K[pts,"LinearTimeOptim"];
+            {p2,p3}//Print;
+
+    	fname = "data/sets_20170503/pts_17476.dat";
+        pts = Import[fname];
+        Graphics[{Point/@pts},ImageSize -> 1/2{ 1024,1024}]//Print;
+            {rPS2,p2,p3} = get2DfourierAndRadial16K[pts,"LinearTimeOptim"];
+            {p2,p3}//Print;
+
+		
+        ListPlot[{
+		            Log[10,#]&  /@ rPS1,
+		            Log[10,#]&  /@ rPS2
+		        },AspectRatio->1,PlotStyle->{Red,Blue},PlotLabel->"Red:May9 Blue: May3"]//Print;
+
+		(* D* *)
+		names = {"pts_1092_23.dat","pts_17476_15.dat","pts_279620_24.dat","pts_4369_17.dat","pts_69905_15.dat"};
+		names = {"pts_1092_23.dat" };
+		Do[
+			name = names[[iname]];
+			fname = "data/sets_20170508/"<>name;
+			pts = Import[fname];
+			npts = Length[pts];
+			d = getDiscrepancy2Dexact[pts];
+			Print["Processing "fname-> {npts,d} ];
+		,{iname,Length[names]}];
    ]
