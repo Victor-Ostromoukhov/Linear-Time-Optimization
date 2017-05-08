@@ -240,6 +240,19 @@ getDiscrepancy2Dexact[pts_] :=
 
 exploreData[] :=
     Module[ {},
+		(* D* *)
+		names = {"pts_1092_23.dat","pts_17476_15.dat","pts_279620_24.dat","pts_4369_17.dat","pts_69905_15.dat"};
+		dtab = Sort @ Table[
+			name = names[[iname]];
+			fname = "data/sets_20170508/"<>name;
+			pts = Import[fname];
+			npts = Length[pts];
+			d = getDiscrepancy2Dexact[pts];
+			Print["Processing "fname-> {npts,d} ];
+		,{iname,Length[names]}];
+		Print[dtab];
+
+		(* Fourier *)
     	fouriertabsz=2 4096;
     	centralSz=2 128;
     	fname = "data/sets_20170508/pts_69905_15.dat";
@@ -262,16 +275,4 @@ exploreData[] :=
 		            Log[10,#]&  /@ rPS2
 		        },AspectRatio->1,PlotStyle->{Red,Blue},PlotLabel->"Red:May9 Blue: May3"]//Print;
 
-		(* D* *)
-		names = {"pts_1092_23.dat","pts_17476_15.dat","pts_279620_24.dat","pts_4369_17.dat","pts_69905_15.dat"};
-		names = {"pts_1092_23.dat" };
-		dtab = Sort @ Table[
-			name = names[[iname]];
-			fname = "data/sets_20170508/"<>name;
-			pts = Import[fname];
-			npts = Length[pts];
-			d = getDiscrepancy2Dexact[pts];
-			Print["Processing "fname-> {npts,d} ];
-		,{iname,Length[names]}];
-		Print[dtab];
    ]
