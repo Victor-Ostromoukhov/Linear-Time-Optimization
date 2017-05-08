@@ -265,7 +265,7 @@ exploreData[] :=
 		(* D* *)
 		names = {"pts_1092_23.dat","pts_17476_15.dat","pts_279620_24.dat","pts_4369_17.dat","pts_69905_15.dat"};
 		names = {"pts_1092_23.dat" };
-		Do[
+		dtab = Sort @ Table[
 			name = names[[iname]];
 			fname = "data/sets_20170508/"<>name;
 			pts = Import[fname];
@@ -273,4 +273,5 @@ exploreData[] :=
 			d = getDiscrepancy2Dexact[pts];
 			Print["Processing "fname-> {npts,d} ];
 		,{iname,Length[names]}];
+		Print[dtab];
    ]
