@@ -254,18 +254,18 @@ getGL2DDiscreapancy[dtab_,imagesize_:{1100,700},ourLabel_:"Ours"] :=
             {npts,val}
         ,{i,3*8, 20*8}];
         coef = 1/2^(4 s) 1/((s - 1) Log[10,2])^((s - 1)/2) // N; (* Roth's consta *)
-        coef = .25;
+        coef = .35;
         refpow1LogS = Table[
             npts = Round[2^(i/8)];
             val = coef (Log[npts])^s npts^-1.0;
             {npts,val}
-        ,{i,15*8, 20*8}];
+        ,{i,12*8, 20*8}];
         coef = .5;
         refpow1LogSMinus1Halved = Table[
             npts = Round[2^(i/8)];
             val = coef (Log[npts])^((s-1)/2) npts^-1.0;
             {npts,val}
-        ,{i,15*8, 20*8}];
+        ,{i,12*8, 20*8}];
         k = .;
         pDiscrepancy = ListPlot[{
 		            Log[10,#]&  /@ refpow05,
@@ -316,7 +316,7 @@ getGL2DDiscreapancy[dtab_,imagesize_:{1100,700},ourLabel_:"Ours"] :=
 exploreDataDiscreapancy[] :=
     Module[ {},
 		(* D* *)
-		names = {"pts_1092_23.dat","pts_17476_15.dat","pts_279620_24.dat","pts_4369_17.dat","pts_69905_15.dat"};
+		(*names = {"pts_1092_23.dat","pts_17476_15.dat","pts_279620_24.dat","pts_4369_17.dat","pts_69905_15.dat"};
 		names = {"pts_17476.dat","pts_279620.dat","pts_69905.dat"};
 		counts = {1092,4369,17476,69905,279620};
 		dtab = Sort @ Table[
@@ -328,11 +328,13 @@ exploreDataDiscreapancy[] :=
 			Print["Processing "fname-> {npts,d} ];
 			{npts,d}
 		,{iname,Length[counts]}];
-		Print[dtab];
+		Print[dtab];*)
 		
 		dtab = {{1092, 0.013725}, {4369, 0.00316811}, {17476, 0.00169935}, {69905, 0.000531731}, {279620, 0.000210969}};
 		dtab = {{17476, 0.00158537},{69905, 0.000450239},{279620, 0.000191513}};
-		getGL2DDiscreapancy[dtab,{1100,700},"LinearTimeOptim May3"]//Print;
+		dtab = {{1092, 0.0100678}, {4369, 0.00365244}, {17476, 0.00145531},{69905, 0.000547352}, {279620, 0.000172269}};
+		dtab = {{1092, 0.0113952}, {4369, 0.00389143}, {17476, 0.00151586}, {69905, 0.000488812}, {279620, 0.000178958}};
+		getGL2DDiscreapancy[dtab,{1100,700},"LinearTimeOptim May9-A"]//Print;
    ]
    
 
