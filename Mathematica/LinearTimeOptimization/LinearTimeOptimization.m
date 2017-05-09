@@ -320,9 +320,8 @@ exploreDataDiscreapancy[] :=
 		names = {"pts_17476.dat","pts_279620.dat","pts_69905.dat"};
 		counts = {1092,4369,17476,69905,279620};
 		dtab = Sort @ Table[
-			name = names[[iname]];
-			fname = "data/sets_20170508/"<>name;
-			fname = "data/sets_20170503/"<>name;
+			name = ToString[counts[[iname]]]<>"_A.pts";
+			fname = "data/sets_20170509/"<>name;
 			pts = Import[fname];
 			npts = Length[pts];
 			d = getDiscrepancy2Dexact[pts];
@@ -372,6 +371,6 @@ exploreDataFourier[] :=
 		            Log[10,#]&  /@ rPS1A,
 		            Log[10,#]&  /@ rPS1B,
 		            Log[10,#]&  /@ rPS2
-		        },AspectRatio->1,PlotStyle->{Red,Blue,Black},PlotLabel->"Red:May9A Blue: May9B, Black:May3"]//Print;
+		        },Joined->True,AspectRatio->1,PlotStyle->{Red,Blue,Black},PlotLabel->"Red:May9A Blue: May9B, Black:May3"]//Print;
 
    ]
