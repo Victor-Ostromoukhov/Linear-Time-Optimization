@@ -320,8 +320,8 @@ exploreDataDiscreapancy[] :=
 		names = {"pts_17476.dat","pts_279620.dat","pts_69905.dat"};
 		counts = {1092,4369,17476,69905,279620};
 		dtab = Sort @ Table[
-			name = ToString[counts[[iname]]]<>"_A.pts";
-			fname = "data/sets_20170509/"<>name;
+			name = ToString[counts[[iname]]]<>"_A.dat";
+			fname = "data/sets_20170509/pts_"<>name;
 			pts = Import[fname];
 			npts = Length[pts];
 			d = getDiscrepancy2Dexact[pts];
@@ -346,9 +346,10 @@ exploreDataFourier[] :=
     	fouriertabsz=2 4096;
     	centralSz=2 128;
     	fname = "data/sets_20170508/pts_69905_15.dat";
-    	fname = "data/sets_20170508/pts_4369_17.dat";
-    	
+    	fname = "data/sets_20170508/pts_4369_17.dat";    	
     	fname = "data/sets_20170509/pts_17476_A.dat";
+    	name = ToString[counts[[3]]]<>"_A.dat";
+		fname = "data/sets_20170509/pts_"<>name;
         pts = Import[fname];
         Graphics[{Point/@pts},ImageSize -> 1/2{ 1024,1024}]//Print;
             {rPS1A,p2,p3} = get2DfourierAndRadial16K[pts,"LinearTimeOptim"];
