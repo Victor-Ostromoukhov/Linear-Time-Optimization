@@ -254,7 +254,7 @@ getGL2DDiscreapancy[dtab_,imagesize_:{1100,700},ourLabel_:"Ours"] :=
             {npts,val}
         ,{i,3*8, 20*8}];
         coef = 1/2^(4 s) 1/((s - 1) Log[10,2])^((s - 1)/2) // N; (* Roth's consta *)
-        coef = .2;
+        coef = .25;
         refpow1LogS = Table[
             npts = Round[2^(i/8)];
             val = coef (Log[npts])^s npts^-1.0;
@@ -313,11 +313,12 @@ getGL2DDiscreapancy[dtab_,imagesize_:{1100,700},ourLabel_:"Ours"] :=
 
 (*-------------------------------------------------------------------*)
 
-exploreData[] :=
+exploreDataDiscreapancy[] :=
     Module[ {},
 		(* D* *)
 		names = {"pts_1092_23.dat","pts_17476_15.dat","pts_279620_24.dat","pts_4369_17.dat","pts_69905_15.dat"};
-		names = {"pts_17476.dat","pts_279620.dat","pts_69905.dat","spectral.png"};
+		names = {"pts_17476.dat","pts_279620.dat","pts_69905.dat"};
+		counts = {1092,4369,17476,69905,279620};
 		dtab = Sort @ Table[
 			name = names[[iname]];
 			fname = "data/sets_20170508/"<>name;
@@ -330,18 +331,34 @@ exploreData[] :=
 		,{iname,Length[names]}];
 		Print[dtab];
 		
-		(*dtab = {{1092, 0.013725}, {4369, 0.00316811}, {17476, 0.00169935}, {69905, 0.000531731}, {279620, 0.000210969}};*)
-		getGL2DDiscreapancy[dtab,{1100,700},"LinearTimeOptim"]//Print;
+		dtab = {{1092, 0.013725}, {4369, 0.00316811}, {17476, 0.00169935}, {69905, 0.000531731}, {279620, 0.000210969}};
+		dtab = {{17476, 0.00158537},{69905, 0.000450239},{279620, 0.000191513}};
+		getGL2DDiscreapancy[dtab,{1100,700},"LinearTimeOptim May3"]//Print;
+   ]
+   
 
+exploreDataFourier[] :=
+    Module[ {},
+		(* D* *)
+		names = {"pts_1092_23.dat","pts_17476_15.dat","pts_279620_24.dat","pts_4369_17.dat","pts_69905_15.dat"};
+		names = {"pts_17476.dat","pts_279620.dat","pts_69905.dat"};
+		counts = {1092,4369,17476,69905,279620};
 		(* Fourier *)
     	fouriertabsz=2 4096;
     	centralSz=2 128;
     	fname = "data/sets_20170508/pts_69905_15.dat";
     	fname = "data/sets_20170508/pts_4369_17.dat";
-    	fname = "data/sets_20170508/pts_17476_15.dat";
+    	
+    	fname = "data/sets_20170509/pts_17476_A.dat";
         pts = Import[fname];
         Graphics[{Point/@pts},ImageSize -> 1/2{ 1024,1024}]//Print;
-            {rPS1,p2,p3} = get2DfourierAndRadial16K[pts,"LinearTimeOptim"];
+            {rPS1A,p2,p3} = get2DfourierAndRadial16K[pts,"LinearTimeOptim"];
+            {p2,p3}//Print;
+
+    	fname = "data/sets_20170509/pts_17476_B.dat";
+        pts = Import[fname];
+        Graphics[{Point/@pts},ImageSize -> 1/2{ 1024,1024}]//Print;
+            {rPS1B,p2,p3} = get2DfourierAndRadial16K[pts,"LinearTimeOptim"];
             {p2,p3}//Print;
 
     	fname = "data/sets_20170503/pts_17476.dat";
@@ -352,8 +369,9 @@ exploreData[] :=
 
 		
         ListPlot[{
-		            Log[10,#]&  /@ rPS1,
+		            Log[10,#]&  /@ rPS1A,
+		            Log[10,#]&  /@ rPS1B,
 		            Log[10,#]&  /@ rPS2
-		        },AspectRatio->1,PlotStyle->{Red,Blue},PlotLabel->"Red:May9 Blue: May3"]//Print;
+		        },AspectRatio->1,PlotStyle->{Red,Blue,Black},PlotLabel->"Red:May9A Blue: May9B, Black:May3"]//Print;
 
    ]
