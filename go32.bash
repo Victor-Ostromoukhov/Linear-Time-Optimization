@@ -12,7 +12,7 @@ for i in 33
 do
 cp Mathematica/LinearTimeOptimization/LinearTimeOptimization.m tmp/proc
 echo " " >> tmp/proc
-echo "exploreData[];" >> tmp/proc
+echo "exploreDataDiscreapancy[];" >> tmp/proc
 
 chmod 700 tmp/proc
 $mexec < tmp/proc > trace$i.txt &
