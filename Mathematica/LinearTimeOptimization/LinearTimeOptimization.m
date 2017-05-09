@@ -327,7 +327,7 @@ exploreDataDiscreapancy[] :=
 			d = getDiscrepancy2Dexact[pts];
 			Print["Processing "fname-> {npts,d} ];
 			{npts,d}
-		,{iname,Length[names]}];
+		,{iname,Length[counts]}];
 		Print[dtab];
 		
 		dtab = {{1092, 0.013725}, {4369, 0.00316811}, {17476, 0.00169935}, {69905, 0.000531731}, {279620, 0.000210969}};
